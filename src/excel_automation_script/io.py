@@ -3,10 +3,12 @@ from pathlib import Path
 
 import pandas as pd
 
+from .paths import DATA_DIR
+
 # -------------------------------------------------------------
 # CONFIGURATION
 # -------------------------------------------------------------
-SOURCE_DIR = Path("data/source")
+SOURCE_DIR = DATA_DIR / "source"
 SKIP_ROWS = 4
 
 # Headers the source file must contain; the run fails if any are missing.

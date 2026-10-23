@@ -3,6 +3,8 @@ from pathlib import Path
 
 import openpyxl
 
+from .paths import DATA_DIR
+
 # -------------------------------------------------------------
 # CONFIGURATION -- a dedicated, never-opened-in-Excel reference
 # file that holds the one known-good pivot definition for
@@ -12,7 +14,7 @@ import openpyxl
 # so a pivot degrading from Excel-side interaction (which has
 # happened twice) can never propagate into a generated output.
 # -------------------------------------------------------------
-PIVOT_REFERENCE_PATH = Path("data/template/pivot_reference.xlsx")
+PIVOT_REFERENCE_PATH = DATA_DIR / "template" / "pivot_reference.xlsx"
 
 
 # -------------------------------------------------------------
