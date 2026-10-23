@@ -1,0 +1,21 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Raw/generated Excel data -- real client business data (SAP exports,
+# generated outputs, comparison references), not reproducible from code,
+# and shouldn't live in git. data/template/output_template.xlsx and
+# pivot_reference.xlsx are the exception: the sanitized template/pivot
+# assets the pipeline itself depends on.
+data/source/
+data/destination/
+data_temp/
+data/template/DIFOT*.xlsx
+experiments/*.xlsx
