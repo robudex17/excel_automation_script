@@ -20,6 +20,15 @@ def filter_by_vendor(df: pd.DataFrame, vendor_name: str) -> pd.DataFrame:
 
 
 # -------------------------------------------------------------
+# LIST (GUI use): every distinct vendor name in the source, for
+# a picker -- so a non-technical user selects from a list instead
+# of typing the vendor name exactly as it appears in the data.
+# -------------------------------------------------------------
+def list_vendors(df: pd.DataFrame) -> list[str]:
+    return sorted(df[VENDOR_COLUMN].dropna().unique().tolist())
+
+
+# -------------------------------------------------------------
 # HELPER: mirrors the 'Data' sheet's DELIVERY formula in pandas
 # -------------------------------------------------------------
 def _delivery_status(row: pd.Series) -> str:
