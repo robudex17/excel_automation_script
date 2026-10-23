@@ -52,3 +52,9 @@ client's `data/template/` folder.
   the client's actual machine.
 - The `.spec` file is tracked in git; `build/` and `dist/` (generated
   output) are gitignored.
+- The build points at `run_gui.py` at the repo root, not
+  `src/excel_automation_script/gui.py` directly. PyInstaller runs
+  whatever script it's given as a standalone top-level script with no
+  parent package, so `gui.py`'s relative imports (`from .io import
+  ...`) fail if it's used as the entry point directly. `run_gui.py`
+  imports the package by its full name instead.
