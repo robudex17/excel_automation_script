@@ -2,7 +2,7 @@
 
 
 a = Analysis(
-    ['src/excel_automation_script/gui.py'],
+    ['run_gui.py'],
     pathex=['src'],
     binaries=[],
     datas=[],
