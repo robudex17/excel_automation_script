@@ -8,7 +8,7 @@ from .metadata import parse_source_filename
 from .pivot import rebuild_pivots_from_reference
 from .resumen import write_chart_window, write_semana_table
 from .transform import filter_by_vendor, filter_pendientes, latest_delivery_month
-from .weeks import semanas_in_month, validate_semana_in_month
+from .weeks import semana_table_weeks, validate_semana_in_month
 
 
 def main() -> None:
@@ -82,13 +82,17 @@ def main() -> None:
     # -------------------------------------------------------------
     # 7. WRITE Semana table: (re)build the Semana/PO Pendiente/
     #    Compromiso/Oportunidad table on 'Resumen - Contrato',
-    #    positioned past the pivot's current Total column, showing
-    #    every Semana that belongs to the source's month
+    #    positioned past the pivot's current Total column. Shows
+    #    the full calendar month's weeks when the current Semana's
+    #    5-week forward window stays within it; flips to that
+    #    forward-only window (dropping already-elapsed weeks) only
+    #    when it would stretch into the next month -- per the
+    #    client's own request
     # -------------------------------------------------------------
-    month_weeks = semanas_in_month(source_meta.month_year)
+    table_weeks = semana_table_weeks(source_meta.date, source_meta.month_year)
 
     try:
-        write_semana_table(output_path, month_weeks, source_semana_number, source_meta.month_year)
+        write_semana_table(output_path, table_weeks, source_semana_number, source_meta.month_year)
     except ValueError as e:
         print(f"Error: {e}")
         sys.exit(1)
@@ -125,6 +129,6 @@ def main() -> None:
     print(f"Filtered rows for '{args.vendor_name}': {len(filtered_df)}")
     print(filtered_df.head())
     print(f"Pendientes - Contrato rows: {len(pendientes_df)}")
-    print(f"Semanas in {source_meta.month_year}: {month_weeks}")
+    print(f"Semana table weeks: {table_weeks}")
     print(f"Output template: {output_template.name}")
     print(f"Saved output to: {output_path.name}")
