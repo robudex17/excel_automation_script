@@ -8,7 +8,7 @@ from .metadata import parse_source_filename
 from .pivot import rebuild_pivots_from_reference
 from .resumen import write_chart_window, write_semana_table
 from .transform import filter_by_vendor, filter_pendientes, latest_delivery_month
-from .weeks import rolling_semanas, validate_semana_in_month
+from .weeks import semana_table_weeks, validate_semana_in_month
 
 
 def main() -> None:
@@ -82,16 +82,17 @@ def main() -> None:
     # -------------------------------------------------------------
     # 7. WRITE Semana table: (re)build the Semana/PO Pendiente/
     #    Compromiso/Oportunidad table on 'Resumen - Contrato',
-    #    positioned past the pivot's current Total column. A
-    #    forward-looking rolling window (5 weeks, starting at the
-    #    report's own Semana) -- not bounded by the calendar month,
-    #    so a report near month-end projects into the next month's
-    #    weeks too, per the client's own request
+    #    positioned past the pivot's current Total column. Shows
+    #    the full calendar month's weeks when the current Semana's
+    #    5-week forward window stays within it; flips to that
+    #    forward-only window (dropping already-elapsed weeks) only
+    #    when it would stretch into the next month -- per the
+    #    client's own request
     # -------------------------------------------------------------
-    rolling_weeks = rolling_semanas(source_meta.date)
+    table_weeks = semana_table_weeks(source_meta.date, source_meta.month_year)
 
     try:
-        write_semana_table(output_path, rolling_weeks, source_semana_number, source_meta.month_year)
+        write_semana_table(output_path, table_weeks, source_semana_number, source_meta.month_year)
     except ValueError as e:
         print(f"Error: {e}")
         sys.exit(1)
@@ -128,6 +129,6 @@ def main() -> None:
     print(f"Filtered rows for '{args.vendor_name}': {len(filtered_df)}")
     print(filtered_df.head())
     print(f"Pendientes - Contrato rows: {len(pendientes_df)}")
-    print(f"Rolling Semana window: {rolling_weeks}")
+    print(f"Semana table weeks: {table_weeks}")
     print(f"Output template: {output_template.name}")
     print(f"Saved output to: {output_path.name}")
