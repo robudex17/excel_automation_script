@@ -19,3 +19,8 @@ data/destination/
 data_temp/
 data/template/DIFOT*.xlsx
 experiments/*.xlsx
+
+# PyInstaller build output -- generated from DIFOT Report Generator.spec,
+# which is tracked; see PACKAGING.md to rebuild
+/build/
+/dist/

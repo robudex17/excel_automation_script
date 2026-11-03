@@ -2,11 +2,13 @@ import re
 import shutil
 from pathlib import Path
 
+from .paths import DATA_DIR
+
 # -------------------------------------------------------------
 # CONFIGURATION
 # -------------------------------------------------------------
-DESTINATION_DIR = Path("data/destination")
-TEMPLATE_PATH = Path("data/template/output_template.xlsx")
+DESTINATION_DIR = DATA_DIR / "destination"
+TEMPLATE_PATH = DATA_DIR / "template" / "output_template.xlsx"
 
 
 # -------------------------------------------------------------
