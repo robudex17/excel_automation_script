@@ -1,3 +1,4 @@
+import shutil
 from pathlib import Path
 
 import pandas as pd
@@ -52,6 +53,21 @@ def find_source_file() -> Path:
             f"{[p.name for p in candidates]}"
         )
     return candidates[0]
+
+
+# -------------------------------------------------------------
+# SET (GUI use): copy a user-picked source file into data/source,
+# replacing whatever was there -- find_source_file() requires
+# exactly one file, and a non-technical user picks it via a file
+# dialog rather than placing it in the folder themselves.
+# -------------------------------------------------------------
+def set_source_file(path: Path) -> Path:
+    SOURCE_DIR.mkdir(parents=True, exist_ok=True)
+    for existing in SOURCE_DIR.glob("*.xlsx"):
+        existing.unlink()
+    destination = SOURCE_DIR / path.name
+    shutil.copyfile(path, destination)
+    return destination
 
 
 # -------------------------------------------------------------
