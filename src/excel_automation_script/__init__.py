@@ -8,7 +8,7 @@ from .metadata import parse_source_filename
 from .pivot import rebuild_pivots_from_reference
 from .resumen import write_chart_window, write_semana_table
 from .transform import filter_by_vendor, filter_pendientes, latest_delivery_month
-from .weeks import semanas_in_month, validate_semana_in_month
+from .weeks import rolling_semanas, validate_semana_in_month
 
 
 def main() -> None:
@@ -82,13 +82,16 @@ def main() -> None:
     # -------------------------------------------------------------
     # 7. WRITE Semana table: (re)build the Semana/PO Pendiente/
     #    Compromiso/Oportunidad table on 'Resumen - Contrato',
-    #    positioned past the pivot's current Total column, showing
-    #    every Semana that belongs to the source's month
+    #    positioned past the pivot's current Total column. A
+    #    forward-looking rolling window (5 weeks, starting at the
+    #    report's own Semana) -- not bounded by the calendar month,
+    #    so a report near month-end projects into the next month's
+    #    weeks too, per the client's own request
     # -------------------------------------------------------------
-    month_weeks = semanas_in_month(source_meta.month_year)
+    rolling_weeks = rolling_semanas(source_meta.date)
 
     try:
-        write_semana_table(output_path, month_weeks, source_semana_number, source_meta.month_year)
+        write_semana_table(output_path, rolling_weeks, source_semana_number, source_meta.month_year)
     except ValueError as e:
         print(f"Error: {e}")
         sys.exit(1)
@@ -125,6 +128,6 @@ def main() -> None:
     print(f"Filtered rows for '{args.vendor_name}': {len(filtered_df)}")
     print(filtered_df.head())
     print(f"Pendientes - Contrato rows: {len(pendientes_df)}")
-    print(f"Semanas in {source_meta.month_year}: {month_weeks}")
+    print(f"Rolling Semana window: {rolling_weeks}")
     print(f"Output template: {output_template.name}")
     print(f"Saved output to: {output_path.name}")
