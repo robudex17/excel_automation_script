@@ -41,7 +41,11 @@ def build_output_path(vendor_name: str, source_semana_label: str, source_date: s
 
 # -------------------------------------------------------------
 # 3. SAVE: copy the template to the new file, leaving the
-#    original output template untouched
+#    original output template untouched. Creates DESTINATION_DIR
+#    if it doesn't exist yet -- a fresh install (a cloned repo, or
+#    the packaged .exe's folder) has no data/destination at all
+#    until the first report is generated.
 # -------------------------------------------------------------
 def save_as_new_file(template: Path, output_path: Path) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy(template, output_path)
