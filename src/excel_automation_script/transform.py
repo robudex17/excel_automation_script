@@ -45,10 +45,23 @@ def _delivery_status(row: pd.Series) -> str:
 # FILTER: keep only rows destined for 'Pendientes - Contrato':
 # an active contract, due in the source's month, not yet complete
 # (PENDIENTE or PARCIAL), and not yet overdue (PERFORMANCE = OK).
-# Sorted by delivery date. "Overdue" is judged against the source
-# report's own date (as_of_date), not the real-world clock --
-# otherwise reprocessing an older report always shows everything
-# as overdue.
+# Sorted by delivery date.
+#
+# PRODUCTION CHANGE (today-formula-deadline branch): "overdue" is
+# now judged against the real-world clock (matching the Data/
+# Pendientes sheet's own DEADLINE formula, which now uses TODAY()
+# per the client's request), not the report's own frozen date. This
+# keeps the two consistent -- a row only gets written into this
+# sheet if it's genuinely OK right now, matching what the sheet's
+# own live PERFORMANCE formula will show on open, today or later.
+#
+# Trade-off: reprocessing an OLDER source file no longer reflects
+# "as of that report's date" -- it reflects today, so an old
+# source's PENDIENTE/PARCIAL items may now appear entirely overdue.
+# Acceptable for the client's actual workflow (each source file is
+# used once, same day, never reopened later), but means this
+# function is no longer safe for testing/debugging against an old
+# source file the way frozen-date reprocessing was.
 # -------------------------------------------------------------
 PENDIENTES_DELIVERY_STATUSES = ["PENDIENTE", "PARCIAL"]
 
@@ -57,7 +70,7 @@ def filter_pendientes(df: pd.DataFrame, month_year: str, as_of_date: str) -> pd.
     calc_date = pd.to_datetime(df[CALC_DELIVERY_COLUMN], errors="coerce")
     delivery = df.apply(_delivery_status, axis=1)
     mes = calc_date.dt.strftime("%b-%Y")
-    today = pd.to_datetime(as_of_date, format="%d%b%Y").normalize()
+    today = pd.Timestamp.now().normalize()
     performance = (calc_date >= today).map({True: "OK", False: "NOK"})
 
     mask = (
