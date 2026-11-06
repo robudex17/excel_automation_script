@@ -129,12 +129,13 @@ def _populate_sheet(ws, sheet_name: str, df: pd.DataFrame, as_of_date: str) -> N
     delivery_letter = get_column_letter(delivery_idx)
     deadline_letter = get_column_letter(deadline_idx)
 
-    # Frozen to the report's own date, not TODAY() -- otherwise DEADLINE/
-    # PERFORMANCE (and everything derived from them: the pivot's OK/NOK
-    # counts, the Resumen table, the chart) silently drift every time the
-    # file is reopened later, instead of staying a snapshot of the report.
-    as_of = datetime.strptime(as_of_date, AS_OF_DATE_FORMAT)
-    as_of_literal = f"DATE({as_of.year},{as_of.month},{as_of.day})"
+    # PRODUCTION CHANGE (today-formula-deadline branch): DEADLINE now uses
+    # TODAY(), matching the client's own manual formula, per her explicit
+    # request. DEADLINE/PERFORMANCE (and everything derived from them --
+    # the pivot's OK/NOK counts, the Resumen table, the chart) will now
+    # recalculate every time the file is reopened, rather than staying a
+    # frozen snapshot of the report's own date.
+    as_of_literal = "TODAY()"
 
     for r in range(2, last_row + 1):
         ws.cell(row=r, column=semana_idx, value=f'="SEM " & WEEKNUM({calc_del_letter}{r})')
